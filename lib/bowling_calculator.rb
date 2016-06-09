@@ -88,8 +88,7 @@ class BowlingCalculator
   private
 
   def can_calculate_additional_scores_for(frame)
-    result = (frame.spare? && frame.next_roll) || (frame.strike? && frame.next_roll && frame.next_two_roll)
-    p "can calculate ? #{result}"
+    (frame.spare? && frame.next_roll) || (frame.strike? && frame.next_roll && frame.next_two_roll)
   end
 
   def calculate_additional_scores_for(frame)
