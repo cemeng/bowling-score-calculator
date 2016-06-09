@@ -14,7 +14,7 @@ RSpec.describe BowlingCalculator, "#score" do
     expect(bowling.calculate).to eq 10
   end
 
-  it "calculates spares correctly", focus: true do
+  it "calculates spares correctly" do
     bowling = BowlingCalculator.new(%w(9 1 9 1).map{ |i| i.to_i })
     expect(bowling.calculate).to eq 29
   end
@@ -24,8 +24,9 @@ RSpec.describe BowlingCalculator, "#score" do
     expect(bowling.calculate).to eq 18
   end
 
+  # actually not sure about this case
   it "returns current when the score is still in calculation" do
     bowling = BowlingCalculator.new(%w(10 1).map{ |i| i.to_i })
-    expect(bowling.calculate).to eq "current"
+    expect(bowling.calculate).to eq 11 # is it this curren or 11?
   end
 end

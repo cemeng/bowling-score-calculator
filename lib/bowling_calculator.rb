@@ -77,10 +77,11 @@ class BowlingCalculator
     @frames.each_with_index do |frame, index|
       total = total + frame.score
       if frame.has_additional_score?
-        return "current" unless can_calculate_additional_scores_for frame
+        # not sure
+        # return "current" unless can_calculate_additional_scores_for frame
         total = total + calculate_additional_scores_for(frame)
       end
-      p "index #{index} this frame score: #{frame.score}, total #{total}"
+      # p "index #{index} this frame score: #{frame.score}, total #{total}"
     end
     total
   end
@@ -88,11 +89,16 @@ class BowlingCalculator
   private
 
   def can_calculate_additional_scores_for(frame)
-    (frame.spare? && frame.next_roll) || (frame.strike? && frame.next_roll && frame.next_two_roll)
+    (frame.spare? && frame.next_roll != nil) ||
+      (frame.strike? && frame.next_roll != nil && frame.next_two_roll != nil)
   end
 
   def calculate_additional_scores_for(frame)
-    frame.next_roll.point if frame.spare?
-    frame.next_roll.point + frame.next_two_roll.point if frame.strike?
+    if frame.spare?
+      (frame.next_roll && frame.next_roll.point) || 0
+    elsif frame.strike?
+      result = (frame.next_roll && frame.next_roll.point) || 0
+      result += (frame.next_two_roll && frame.next_two_roll.point) || 0
+    end
   end
 end
