@@ -29,6 +29,14 @@ class Frame
     @rolls[1]
   end
 
+  def next_roll
+    @rolls.last.next_roll
+  end
+
+  def next_two_roll
+    @rolls.last.next_roll.next_roll
+  end
+
   def spare?
     !strike? && score == 10
   end
@@ -40,6 +48,7 @@ end
 
 class Roll
   attr_reader :point
+  attr_accessor :next_roll
 
   def initialize(point:)
     @point = point
@@ -50,8 +59,11 @@ class BowlingCalculator
   def initialize(rolls)
     @frames = []
     frame = Frame.new
+    previous_roll = nil
     rolls.each_with_index do |point|
       roll = Roll.new(point: point)
+      previous_roll.next_roll = roll if previous_roll
+      previous_roll = roll
       frame.add(roll)
       if frame.finished?
         @frames << frame
@@ -68,7 +80,7 @@ class BowlingCalculator
         return "current" unless can_calculate_additional_scores_for frame
         total = total + calculate_additional_scores_for(frame)
       end
-      # p "index #{index} this frame score: #{frame.score}, total #{total}"
+      p "index #{index} this frame score: #{frame.score}, total #{total}"
     end
     total
   end

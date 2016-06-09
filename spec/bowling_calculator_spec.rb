@@ -14,7 +14,7 @@ RSpec.describe BowlingCalculator, "#score" do
     expect(bowling.calculate).to eq 10
   end
 
-  it "calculates spares correctly" do
+  it "calculates spares correctly", focus: true do
     bowling = BowlingCalculator.new(%w(9 1 9 1).map{ |i| i.to_i })
     expect(bowling.calculate).to eq 29
   end
