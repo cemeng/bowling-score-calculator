@@ -1,7 +1,7 @@
 
 require "bowling_calculator"
 
-RSpec.describe BowlingCalculator, "#score" do
+RSpec.describe BowlingCalculator, "#calculate" do
   it "sums" do
     frames = []
     12.times { frames.push(10) }
@@ -24,9 +24,8 @@ RSpec.describe BowlingCalculator, "#score" do
     expect(bowling.calculate).to eq 18
   end
 
-  # actually not sure about this case
   it "returns current when the score is still in calculation" do
     bowling = BowlingCalculator.new(%w(10 1).map{ |i| i.to_i })
-    expect(bowling.calculate).to eq 11 # is it this curren or 11?
+    expect(bowling.calculate).to eq 11
   end
 end

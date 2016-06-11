@@ -1,8 +1,12 @@
 require "pry"
 
 class Frame
-  def initialize()
+  def initialize
     @rolls = []
+  end
+
+  def add(roll)
+    @rolls.push(roll)
   end
 
   def finished?
@@ -13,21 +17,11 @@ class Frame
     @rolls.inject(0) { |sum, r| sum + r.point }
   end
 
-  def add(roll)
-    @rolls.push(roll)
+  def total_score
+    score + additional_score
   end
 
-  def has_additional_score?
-    spare? || strike?
-  end
-
-  def first_roll
-    @rolls[0]
-  end
-
-  def second_roll
-    @rolls[1]
-  end
+  private
 
   def next_roll
     @rolls.last.next_roll
@@ -42,7 +36,23 @@ class Frame
   end
 
   def strike?
-    first_roll.point == 10
+    @rolls[0].point == 10
+  end
+
+  def additional_score
+    return 0 unless spare? || strike?
+    return calculate_spare_score if spare?
+    return calculate_strike_score if strike?
+  end
+
+  def calculate_spare_score
+    return 0 unless next_roll
+    next_roll.point
+  end
+
+  def calculate_strike_score
+    return 0 unless next_roll && next_two_roll
+    next_roll.point + next_two_roll.point
   end
 end
 
@@ -56,49 +66,25 @@ class Roll
 end
 
 class BowlingCalculator
-  def initialize(rolls)
+  def initialize(roll_points)
     @frames = []
-    frame = Frame.new
+    frame = nil
     previous_roll = nil
-    rolls.each_with_index do |point|
+    roll_points.each do |point|
+      frame = Frame.new unless frame
       roll = Roll.new(point: point)
       previous_roll.next_roll = roll if previous_roll
       previous_roll = roll
-      frame.add(roll)
+      frame.add roll
       if frame.finished?
         @frames << frame
-        frame = Frame.new
+        frame = nil
       end
     end
+    @frames << frame if frame
   end
 
   def calculate
-    total = 0
-    @frames.each_with_index do |frame, index|
-      total = total + frame.score
-      if frame.has_additional_score?
-        # not sure
-        # return "current" unless can_calculate_additional_scores_for frame
-        total = total + calculate_additional_scores_for(frame)
-      end
-      # p "index #{index} this frame score: #{frame.score}, total #{total}"
-    end
-    total
-  end
-
-  private
-
-  def can_calculate_additional_scores_for(frame)
-    (frame.spare? && frame.next_roll != nil) ||
-      (frame.strike? && frame.next_roll != nil && frame.next_two_roll != nil)
-  end
-
-  def calculate_additional_scores_for(frame)
-    if frame.spare?
-      (frame.next_roll && frame.next_roll.point) || 0
-    elsif frame.strike?
-      result = (frame.next_roll && frame.next_roll.point) || 0
-      result += (frame.next_two_roll && frame.next_two_roll.point) || 0
-    end
+    @frames.inject(0) { |sum, frame| sum + frame.total_score }
   end
 end
