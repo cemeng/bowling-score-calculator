@@ -1,7 +1,8 @@
 require "pry"
 
 class Frame
-  def initialize
+  def initialize(frame_number:)
+    @frame_number = frame_number
     @rolls = []
   end
 
@@ -10,7 +11,11 @@ class Frame
   end
 
   def finished?
-    score == 10 || @rolls.size >= 2
+    if final_frame?
+      (score < 10 && @rolls.size == 2) || @rolls.size == 3
+    else
+      score == 10 || @rolls.size == 2
+    end
   end
 
   def score
@@ -22,6 +27,10 @@ class Frame
   end
 
   private
+
+  def final_frame?
+    @frame_number == 10
+  end
 
   def next_roll
     @rolls.last.next_roll
@@ -71,7 +80,7 @@ class BowlingCalculator
     frame = nil
     previous_roll = nil
     roll_points.each do |point|
-      frame = Frame.new unless frame
+      frame = Frame.new(frame_number: @frames.size + 1) unless frame
       roll = Roll.new(point: point)
       previous_roll.next_roll = roll if previous_roll
       previous_roll = roll
@@ -82,6 +91,13 @@ class BowlingCalculator
       end
     end
     @frames << frame if frame
+    if @frames.size > 10
+      # use squish on rails
+      throw <<-MSG
+        Error: found #{@frames.size} frames, a bowling game should only consist of 10 frames.
+        Please check your input
+      MSG
+    end
   end
 
   def calculate

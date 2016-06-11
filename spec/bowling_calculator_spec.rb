@@ -1,15 +1,13 @@
-
 require "bowling_calculator"
 
 RSpec.describe BowlingCalculator, "#calculate" do
-  it "sums" do
+  it "calculates the perfect game" do
     frames = []
     12.times { frames.push(10) }
-    bowling = BowlingCalculator.new(frames)
-    expect(bowling.calculate).to eq 300
+    expect(BowlingCalculator.new(frames).calculate).to eq 300
   end
 
-  it "sums more" do
+  it "calculates basic scenario correctly" do
     bowling = BowlingCalculator.new(%w(1 2 3 4).map{ |i| i.to_i })
     expect(bowling.calculate).to eq 10
   end
@@ -24,7 +22,12 @@ RSpec.describe BowlingCalculator, "#calculate" do
     expect(bowling.calculate).to eq 18
   end
 
-  it "returns current when the score is still in calculation" do
+  it "calculate a complete strike" do
+    bowling = BowlingCalculator.new(%w(10 1 1).map{ |i| i.to_i })
+    expect(bowling.calculate).to eq 14
+  end
+
+  it "returns current score even when a complete score for a strike cannot be calculated" do
     bowling = BowlingCalculator.new(%w(10 1).map{ |i| i.to_i })
     expect(bowling.calculate).to eq 11
   end
